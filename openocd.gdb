@@ -1,10 +1,20 @@
+# Connect to gdb remote server
 target extended-remote :3333
 
 # print demangled symbols
 set print asm-demangle on
 
+# Enable pretty printing
+set print pretty on
+
+# Disable style sources as the default colors can be hard to read
+set style sources off
+
+# Toggle off quit confirmation
+set confirm off
+
 # set backtrace limit to not have infinite backtrace loops
-set backtrace limit 32
+set backtrace limit 64
 
 # detect unhandled exceptions, hard faults and panics
 break DefaultHandler
@@ -24,7 +34,7 @@ monitor arm semihosting enable
 # # send captured ITM to the file itm.fifo
 # # (the microcontroller SWO pin must be connected to the programmer SWO pin)
 # # 8000000 must match the core clock frequency
-# monitor tpiu config internal itm.txt uart off 8000000
+monitor tpiu config internal itm.txt uart off 8000000
 
 # # OR: make the microcontroller SWO pin output compatible with UART (8N1)
 # # 8000000 must match the core clock frequency
@@ -32,9 +42,11 @@ monitor arm semihosting enable
 # monitor tpiu config external uart off 8000000 2000000
 
 # # enable ITM port 0
-# monitor itm port 0 on
+monitor itm port 0 on
 
+# Load will flash the code
 load
 
-# start the process but immediately halt the processor
-stepi
+# continue until first breakpoint (probably main) then step
+continue
+step
