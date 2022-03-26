@@ -9,6 +9,7 @@
 * This repo is generated from the [Cortex M Quickstart repo](https://github.com/rust-embedded/cortex-m-quickstart)
 * Embedded rust book https://docs.rust-embedded.org/book/start/
 * Embedded rust discovery book https://docs.rust-embedded.org/discovery/f3discovery
+* stm32f3 device crate https://docs.rs/stm32f3/0.13.2/stm32f3/index.html
 
 ## Setup
 

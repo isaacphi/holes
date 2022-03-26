@@ -7,16 +7,21 @@ use panic_halt as _; // you can put a breakpoint on `rust_begin_unwind` to catch
 // use panic_itm as _; // logs messages over ITM; requires ITM support
 // use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
 
-use cortex_m::{iprintln};
+// Need stm32f3xx_hal::prelude::* otherwise
+//   'Error(corex-m-rt): The interrupt vectors are missing`
+#[allow(unused_imports)]
+use stm32f3_discovery::stm32f3xx_hal::prelude::*;
+#[warn(unused_imports)]
+
 use cortex_m_rt::entry;
+use cortex_m::{iprintln, Peripherals};
 
 #[entry]
 fn main() -> ! {
-    let mut itm = cortex_m::Peripherals::take().unwrap().ITM;
+    let mut p = Peripherals::take().unwrap();
+    let stim = &mut p.ITM.stim[0];
 
-    iprintln!(&mut itm.stim[0], "Begin");
+    iprintln!(stim, "Begin");
 
-    loop {
-        
-    }
+    loop {}
 }
