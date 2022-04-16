@@ -13,6 +13,8 @@ use stm32f3_discovery::stm32f3xx_hal::{pwm::tim1, time::rate::*};
 
 use stm32f3_discovery::switch_hal::{IntoSwitch, InputSwitch, OutputSwitch};
 
+use max7219::*;
+
 #[entry]
 fn main() -> ! {
     // Configure peripherals
@@ -34,7 +36,18 @@ fn main() -> ! {
     let mut ch1 = c1_no_pins.output_to_pa8(pa8);
     ch1.set_duty(ch1.get_max_duty() / 2);
     ch1.enable();
-    
+
+    // MAX7219 display
+    let mut gpioc = device_periphs.GPIOC.split(&mut rcc.ahb);
+    let sck = gpioc.pc10.into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper);
+    // let miso = gpioc.pc11.into_af_push_pull(&mut gpioc.moder, &mut gpioc.otyper, &mut gpioc.afrh);
+    let cs = gpioc.pc13.into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper);
+    let data = gpioc.pc12.into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper);
+    let mut display = MAX7219::from_pins(1, data, cs, sck).unwrap();
+    display.power_on().unwrap();
+    display.write_str(0, b"pls help", 0b00100000).unwrap();
+    display.set_intensity(0, 0x1).unwrap();
+
     // LED
     let mut gpioe = device_periphs.GPIOE.split(&mut rcc.ahb);
     let mut led = gpioe.pe12.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper).into_active_high_switch();
@@ -47,18 +60,19 @@ fn main() -> ! {
 
     loop {
         delay.delay_ms(50u16);
-        match button.is_active() {
-            Ok(true) => {
-                iprintln!(stim, "on");
-                led.on().ok();
-            }
-            Ok(false) => {
-                iprintln!(stim, "off");
-                led.off().ok();
-            }
-            Err(_) => {
-                panic!("Failed to read start button state");
-            }
-        }
+        
+        // match button.is_active() {
+        //     Ok(true) => {
+        //         iprintln!(stim, "on");
+        //         led.on().ok();
+        //     }
+        //     Ok(false) => {
+        //         iprintln!(stim, "off");
+        //         led.off().ok();
+        //     }
+        //     Err(_) => {
+        //         panic!("Failed to read start button state");
+        //     }
+        // }
     }
 }
